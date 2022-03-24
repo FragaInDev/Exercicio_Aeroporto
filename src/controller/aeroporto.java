@@ -6,46 +6,55 @@ import java.util.concurrent.Semaphore;
 public class aeroporto extends Thread {
 	private int aviao;
 	private Semaphore semaforo;
+	private Semaphore a_pista;
 
-	public aeroporto(int _aviao, Semaphore smf) {
+	public aeroporto(int _aviao, Semaphore smf, Semaphore ap) {
 		aviao = _aviao;
 		semaforo = smf;
+		a_pista = ap;
 
 	}
 
 	@Override
 	public void run() {
 		int pista = (int) ((Math.random()*2)+1);
-		switch (pista) {
-		case 1:
-			try {
-				semaforo.acquire();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} finally {
-				semaforo.release();
+		try {
+			a_pista.acquire();
+			switch (pista) {
+			case 1:
+				try {
+					semaforo.acquire();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} finally {
+					semaforo.release();
+				}
+				manobra();
+				taxiar();
+				decolar();
+				afastamento();
+				System.out.println("O avião "+ aviao + " alçou voo da pista norte.");
+				break;
+			
+			case 2:
+				try {
+					semaforo.acquire();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} finally {
+					semaforo.release();
+				}
+				manobra();
+				taxiar();
+				decolar();
+				afastamento();
+				System.out.println("O avião "+ aviao + " alçou voo da pista sul.");
+				break;
 			}
-			manobra();
-			taxiar();
-			decolar();
-			afastamento();
-			System.out.println("O avião "+ aviao + " alçou voo da pista norte.");
-			break;
-		
-		case 2:
-			try {
-				semaforo.acquire();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} finally {
-				semaforo.release();
-			}
-			manobra();
-			taxiar();
-			decolar();
-			afastamento();
-			System.out.println("O avião "+ aviao + " alçou voo da pista sul.");
-			break;
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		} finally {
+			a_pista.release();
 		}
 	}
 	// aviao faz manobra que dura de 3 a 7 segundos
